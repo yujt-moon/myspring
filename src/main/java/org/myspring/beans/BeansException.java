@@ -1,6 +1,7 @@
 package org.myspring.beans;
 
 /**
+ * bean的异常类
  * @author yujiangtao
  * @date 2018/8/2 20:00
  */

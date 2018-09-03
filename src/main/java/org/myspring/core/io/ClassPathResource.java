@@ -6,13 +6,20 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 /**
+ * 通过classpath读取的数据源
  * @author yujiangtao
  * @date 2018/8/2 10:43
  */
 public class ClassPathResource implements Resource {
 
+    /**
+     * classpath下的路径
+     */
     private String path;
 
+    /**
+     * 类加载器
+     */
     private ClassLoader classLoader;
 
     public ClassPathResource(String path) {

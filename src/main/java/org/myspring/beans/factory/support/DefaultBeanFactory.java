@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2018/8/2 11:08
  */
 public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
-        implements ConfigurableBeanFactory, BeanDefinitionRegistry {
+                                implements ConfigurableBeanFactory, BeanDefinitionRegistry {
 
     // 存储bean的定义
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>();
@@ -24,12 +24,23 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
     @Override
     public Object getBean(String beanId) {
         BeanDefinition bd = beanDefinitionMap.get(beanId);
-        Object singletonObject = singletonObjectMap.get(beanId);
-        if(singletonObject == null) {
-            singletonObject = resovleSingletonObject(bd);
-            singletonObjectMap.put(beanId, singletonObject);
+        String scope = bd.getScope();
+        // 如果当前的bean的范围为单例
+        if("singleton".equals(scope) || "".equals(scope)) {
+            Object singletonObject = singletonObjectMap.get(beanId);
+            if(singletonObject == null) {
+                singletonObject = resovleSingletonObject(bd);
+                singletonObjectMap.put(beanId, singletonObject);
+            }
+            return singletonObject;
         }
-        return singletonObject;
+        // 当前的bean的范围为原型
+        else if("prototype".equals(scope)) {
+            return resovleSingletonObject(bd);
+        } else {
+            // 如果范围都不符合，抛出异常
+            throw new RuntimeException("Bean's scope is not correct!");
+        }
     }
 
     @Override

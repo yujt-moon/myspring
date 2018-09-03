@@ -7,5 +7,11 @@
     <bean id="petStore" class="org.myspring.service.v1.PetStoreService">
     </bean>
 
+    <bean id="catStore" class="org.myspring.service.v1.CatStoreService" scope="singleton">
+    </bean>
+
+    <bean id="dogStore" class="org.myspring.service.v1.DogStoreService" scope="prototype">
+    </bean>
+
     <bean id="invalidBean" class="xx.xxx"></bean>
 </beans>

@@ -6,6 +6,7 @@ import org.myspring.context.ApplicationContext;
 import org.myspring.core.io.Resource;
 
 /**
+ * 抽象的yingyong上下文
  * @author yujiangtao
  * @date 2018/8/3 15:13
  */

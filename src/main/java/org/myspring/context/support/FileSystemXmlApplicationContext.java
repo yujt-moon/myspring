@@ -4,6 +4,7 @@ import org.myspring.core.io.FileSystemResource;
 import org.myspring.core.io.Resource;
 
 /**
+ * 通过文件系统中的配置文件获取应用上下文
  * @author yujiangtao
  * @date 2018/8/3 15:30
  */

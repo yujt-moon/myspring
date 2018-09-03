@@ -8,22 +8,38 @@ import org.myspring.beans.factory.BeanDefinitionStoreException;
 import org.myspring.beans.factory.support.BeanDefinitionRegistry;
 import org.myspring.beans.factory.support.GenericBeanDefinition;
 import org.myspring.core.io.Resource;
+import org.myspring.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
 /**
+ * 通过读取xml，产生bean的定义
  * @author yujiangtao
  * @date 2018/8/2 11:16
  */
 public class XmlBeanDefinitionReader {
 
+    /**
+     * bean标签
+     */
     public static final String ELEMENT_BEAN = "bean";
 
+    /**
+     * id属性
+     */
     public static final String ATTRIBUTE_ID = "id";
 
+    /**
+     * class属性
+     */
     public static final String ATTRIBUTE_CLASS = "class";
+
+    /**
+     * scope属性
+     */
+    public static final String ATTRIBUTE_SCOPE = "scope";
 
     private BeanDefinitionRegistry registry;
 
@@ -49,7 +65,14 @@ public class XmlBeanDefinitionReader {
                     String id = ele.attributeValue(ATTRIBUTE_ID);
                     // 获取bean class
                     String className = ele.attributeValue(ATTRIBUTE_CLASS);
-                    BeanDefinition bd = new GenericBeanDefinition(id, className);
+                    // 获取bean scope
+                    String scope = ele.attributeValue(ATTRIBUTE_SCOPE);
+                    BeanDefinition bd = null;
+                    if(StringUtils.hasLength(scope)) {
+                        bd = new GenericBeanDefinition(id, className, scope);
+                    } else {
+                        bd = new GenericBeanDefinition(id, className);
+                    }
                     registry.registerBeanDefinition(id, bd);
                 }
             }

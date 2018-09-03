@@ -3,21 +3,35 @@ package org.myspring.beans.factory.support;
 import org.myspring.beans.BeanDefinition;
 
 /**
+ * 普通的beanDefinition
  * @author yujiangtao
  * @date 2018/8/2 14:02
  */
 public class GenericBeanDefinition implements BeanDefinition {
 
+    /**
+     * id对应于xml中的<bean id="xxxx"></bean>
+     */
     private String id;
 
+    /**
+     * beanClassName对应于xml中的<bean class="com.xxx.xxx"></bean>
+     */
     private String beanClassName;
 
-    // TODO 暂不实现
-    private String scope = "";
+    /**
+     * scope对应于xml中的<bean scope="singleton|prototype"></>
+     */
+    private String scope;
 
     public GenericBeanDefinition(String id, String beanClassName) {
+        this(id, beanClassName, "");
+    }
+
+    public GenericBeanDefinition(String id, String beanClassName, String scope) {
         this.id = id;
         this.beanClassName = beanClassName;
+        this.scope = scope;
     }
 
     @Override

@@ -6,12 +6,19 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * 文件系统的资源
  * @author yujiangtao
  * @date 2018/8/2 10:54
  */
 public class FileSystemResource implements Resource {
+    /**
+     * 文件的路径
+     */
     private String path;
 
+    /**
+     * 文件对象
+     */
     private File file;
 
     public FileSystemResource(String path) {

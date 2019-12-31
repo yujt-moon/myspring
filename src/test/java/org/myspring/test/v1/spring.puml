@@ -1,0 +1,103 @@
+@startuml
+
+package "org.myspring.beans" {
+
+    interface BeanDefinition {
+        + {static} SCOPE_SINGLETON : String
+        + {static} SCOPE_PROTOTYPE : String
+        + {static} SCOPE_DEFAULT : String
+        + String getId()
+        + String getBeanClassName()
+        + boolean isSingleton()
+        + boolean isPrototype()
+        + String getScope()
+    }
+    note top: xml文件中<bean>的抽象
+
+    package "factory" {
+        interface BeanFactory {
+            + Object getBean(String)
+        }
+
+        package "config" {
+            interface ConfigurableBeanFactory {
+                + void setBeanClassLoader(ClassLoader)
+            }
+
+            interface SingletonBeanRegistry {
+                + void registerSingleton(String, Object)
+                + Object getSingleton(String)
+            }
+        }
+
+        package "support" {
+
+            interface BeanDefinitionRegistry {
+
+            }
+
+            class DefaultBeanFactory {
+
+            }
+
+            class GenericBeanDefinition {
+                + GenericBeanDefinition(String, String, String)
+                + GenericBeanDefinition(String, String)
+            }
+        }
+    }
+}
+
+package "org.myspring.core.io" as coreio #green {
+    interface Resource {
+        + InputStream getInputStream()
+        + String getDescription()
+    }
+
+    class FileSystemResource {
+    }
+
+    class ClassPathResource {
+    }
+}
+
+package "org.myspring.context" {
+    interface ApplicationContext {
+        + Object getBean(String)
+    }
+
+    package "support" {
+        abstract class AbstractApplicationContext {
+            - factory : DefaultBeanFactory
+            - beanClassLoader : ClassLoader
+            + ClassLoader getBeanClassLoader()
+            + void setBeanClassLoader()
+            ..这是一个注释..
+            # {abstract} Resource getResourceByPath(String)
+        }
+
+        class FileSystemXmlApplicationContext {
+            + FileSystemXmlApplicationContext(String)
+        }
+
+        class ClassPathXmlApplicationContext {
+            + ClassPathXmlApplicationContext(String)
+        }
+    }
+}
+
+
+
+FileSystemResource ..|> Resource
+ClassPathResource ..|> Resource
+
+AbstractApplicationContext ..|> ApplicationContext
+FileSystemXmlApplicationContext --|> AbstractApplicationContext
+ClassPathXmlApplicationContext --|> AbstractApplicationContext
+
+ConfigurableBeanFactory --|> BeanFactory
+
+GenericBeanDefinition ..|> BeanDefinition
+
+
+@enduml

@@ -103,12 +103,15 @@ public abstract class StringUtils {
         // remember to append any characters to the right of a match
         return sb.toString();
     }
+
     public static String[] commaDelimitedListToStringArray(String str) {
         return delimitedListToStringArray(str, ",");
     }
+
     public static String[] delimitedListToStringArray(String str, String delimiter) {
         return delimitedListToStringArray(str, delimiter, null);
     }
+
     public static String[] delimitedListToStringArray(String str, String delimiter, String charsToDelete) {
         if (str == null) {
             return new String[0];
@@ -136,6 +139,7 @@ public abstract class StringUtils {
         }
         return toStringArray(result);
     }
+
     public static String deleteAny(String inString, String charsToDelete) {
         if (!hasLength(inString) || !hasLength(charsToDelete)) {
             return inString;

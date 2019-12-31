@@ -18,16 +18,13 @@ public class ResourceTest {
     @Test
     public void testClassPathResource() throws Exception {
         Resource r = new ClassPathResource("petstore-v1.xml");
-
         testResourceExist(r);
     }
 
     @Test
     public void testFileSystemResource() throws Exception {
         Resource r = new FileSystemResource("src\\test\\resources\\petstore-v1.xml");
-
         testResourceExist(r);
-
     }
 
     /**
@@ -37,7 +34,6 @@ public class ResourceTest {
      */
     private void testResourceExist(Resource r) throws Exception {
         InputStream is = null;
-
         try {
             is = r.getInputStream();
             // 注意：这个测试其实并不充分！！

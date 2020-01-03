@@ -1,5 +1,7 @@
 package org.myspring.beans;
 
+import java.util.List;
+
 /**
  * bean定义类
  * @author yujiangtao
@@ -51,4 +53,6 @@ public interface BeanDefinition {
      * @return
      */
     String getScope();
+
+    List<PropertyValue> getPropertyValues();
 }

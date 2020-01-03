@@ -1,10 +1,15 @@
 package org.myspring.beans.factory.xml;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.myspring.beans.BeanDefinition;
+import org.myspring.beans.PropertyValue;
 import org.myspring.beans.factory.BeanDefinitionStoreException;
+import org.myspring.beans.factory.config.RuntimeBeanReference;
+import org.myspring.beans.factory.config.TypedStringValue;
 import org.myspring.beans.factory.support.BeanDefinitionRegistry;
 import org.myspring.beans.factory.support.GenericBeanDefinition;
 import org.myspring.core.io.Resource;
@@ -24,24 +29,46 @@ public class XmlBeanDefinitionReader {
     /**
      * bean标签
      */
-    public static final String ELEMENT_BEAN = "bean";
+    public static final String BEAN_ELEMENT = "bean";
 
     /**
      * id属性
      */
-    public static final String ATTRIBUTE_ID = "id";
+    public static final String ID_ATTRIBUTE = "id";
 
     /**
      * class属性
      */
-    public static final String ATTRIBUTE_CLASS = "class";
+    public static final String CLASS_ATTRIBUTE = "class";
 
     /**
      * scope属性
      */
-    public static final String ATTRIBUTE_SCOPE = "scope";
+    public static final String SCOPE_ATTRIBUTE = "scope";
+
+    /**
+     * property标签
+     */
+    public static final String PROPERTY_ELEMENT = "property";
+
+    /**
+     * ref 属性
+     */
+    public static final String REF_ATTRIBUTE = "ref";
+
+    /**
+     * value 属性
+     */
+    public static final String VALUE_ATTRIBUTE = "value";
+
+    /**
+     * name 属性
+     */
+    public static final String NAME_ATTRIBUTE = "name";
 
     private BeanDefinitionRegistry registry;
+
+    protected final Log logger = LogFactory.getLog(this.getClass());
 
     public XmlBeanDefinitionReader(BeanDefinitionRegistry registry) {
         this.registry = registry;
@@ -60,19 +87,20 @@ public class XmlBeanDefinitionReader {
             while(it.hasNext()) {
                 Element ele = (Element) it.next();
                 // 处理bean标签
-                if(ELEMENT_BEAN.equals(ele.getName())) {
+                if(BEAN_ELEMENT.equals(ele.getName())) {
                     // 获取bean id
-                    String id = ele.attributeValue(ATTRIBUTE_ID);
+                    String id = ele.attributeValue(ID_ATTRIBUTE);
                     // 获取bean class
-                    String className = ele.attributeValue(ATTRIBUTE_CLASS);
+                    String className = ele.attributeValue(CLASS_ATTRIBUTE);
                     // 获取bean scope
-                    String scope = ele.attributeValue(ATTRIBUTE_SCOPE);
+                    String scope = ele.attributeValue(SCOPE_ATTRIBUTE);
                     BeanDefinition bd = null;
                     if(StringUtils.hasLength(scope)) {
                         bd = new GenericBeanDefinition(id, className, scope);
                     } else {
                         bd = new GenericBeanDefinition(id, className);
                     }
+                    parsePropertyElement(ele, bd);
                     registry.registerBeanDefinition(id, bd);
                 }
             }
@@ -87,6 +115,45 @@ public class XmlBeanDefinitionReader {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    private void parsePropertyElement(Element beanElem, BeanDefinition bd) {
+        Iterator properties = beanElem.elementIterator(PROPERTY_ELEMENT);
+        while(properties.hasNext()) {
+            Element property = (Element) properties.next();
+            String name = property.attributeValue(NAME_ATTRIBUTE);
+            if(!StringUtils.hasLength(name)) {
+                logger.fatal("Tag 'property' must have a 'name' attribute");
+                return;
+            }
+
+            Object val = parsePropertyValue(property, bd, name);
+            PropertyValue pv = new PropertyValue(name, val);
+
+            bd.getPropertyValues().add(pv);
+        }
+    }
+
+    private Object parsePropertyValue(Element ele, BeanDefinition bd, String propertyName) {
+        String elementName = (propertyName != null) ?
+                                                "<property> element for property '" + propertyName + "'" :
+                                                "<constructor-arg> element";
+        boolean hasRefAttribute = ele.attribute(REF_ATTRIBUTE) != null;
+        boolean hasValueAttribute = ele.attribute(VALUE_ATTRIBUTE) != null;
+
+        if(hasRefAttribute) {
+            String refName = ele.attributeValue(REF_ATTRIBUTE);
+            if(!StringUtils.hasText(refName)) {
+                logger.error(elementName + " contains empty 'ref' attribute");
+            }
+            RuntimeBeanReference ref = new RuntimeBeanReference(refName);
+            return ref;
+        } else if(hasValueAttribute) {
+            TypedStringValue valueHolder = new TypedStringValue(ele.attributeValue(VALUE_ATTRIBUTE));
+            return valueHolder;
+        } else {
+            throw new RuntimeException(elementName + " must specify a ref or value");
         }
     }
 }

@@ -33,11 +33,18 @@ package "org.myspring.beans" {
         package "support" {
 
             interface BeanDefinitionRegistry {
-
+                + BeanDefinition getBeanDefinition(String)
+                + void registerBeanDefinition()
             }
 
             class DefaultBeanFactory {
+                - beanDefinitionMap : Map<String, BeanDefinition>
+                - beanClassLoader : ClassLoader
+                - Object resovleSingletonObject(BeanDefinition)
+            }
 
+            class DefaultSingletonBeanRegistry {
+                # singletonObjectMap : Map<String, Object>
             }
 
             class GenericBeanDefinition {
@@ -92,6 +99,7 @@ FileSystemResource ..|> Resource
 ClassPathResource ..|> Resource
 
 AbstractApplicationContext ..|> ApplicationContext
+AbstractApplicationContext ..> Resource
 FileSystemXmlApplicationContext --|> AbstractApplicationContext
 ClassPathXmlApplicationContext --|> AbstractApplicationContext
 
@@ -99,5 +107,10 @@ ConfigurableBeanFactory --|> BeanFactory
 
 GenericBeanDefinition ..|> BeanDefinition
 
+DefaultSingletonBeanRegistry ..|> SingletonBeanRegistry
+
+DefaultBeanFactory ..|> ConfigurableBeanFactory
+DefaultBeanFactory ..|> BeanDefinitionRegistry
+DefaultBeanFactory --|> DefaultSingletonBeanRegistry
 
 @enduml

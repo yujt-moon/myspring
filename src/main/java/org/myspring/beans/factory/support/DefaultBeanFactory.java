@@ -1,10 +1,17 @@
 package org.myspring.beans.factory.support;
 
 import org.myspring.beans.BeanDefinition;
+import org.myspring.beans.PropertyValue;
+import org.myspring.beans.SimpleTypeConverter;
+import org.myspring.beans.TypeConverter;
 import org.myspring.beans.factory.BeanCreationException;
 import org.myspring.beans.factory.config.ConfigurableBeanFactory;
 import org.myspring.util.ClassUtils;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,22 +31,75 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
     @Override
     public Object getBean(String beanId) {
         BeanDefinition bd = beanDefinitionMap.get(beanId);
-        String scope = bd.getScope();
-        // 如果当前的bean的范围为单例
-        if("singleton".equals(scope) || "".equals(scope)) {
-            Object singletonObject = singletonObjectMap.get(beanId);
-            if(singletonObject == null) {
-                singletonObject = resovleSingletonObject(bd);
-                singletonObjectMap.put(beanId, singletonObject);
-            }
-            return singletonObject;
+        if(bd == null) {
+            return null;
         }
-        // 当前的bean的范围为原型
-        else if("prototype".equals(scope)) {
-            return resovleSingletonObject(bd);
-        } else {
-            // 如果范围都不符合，抛出异常
-            throw new RuntimeException("Bean's scope is not correct!");
+
+        if(bd.isSingleton()) {
+            Object bean = this.getSingleton(beanId);
+            if(bean == null) {
+                bean = createBean(bd);
+                this.registerSingleton(beanId, bean);
+            }
+            return bean;
+        }
+        return createBean(bd);
+    }
+
+    private Object createBean(BeanDefinition bd) {
+        // 创建实例
+        Object bean = instantiateBean(bd);
+        // 设置属性
+        populateBean(bd, bean);
+        return bean;
+    }
+
+    protected void populateBean(BeanDefinition bd, Object bean) {
+        List<PropertyValue> pvs = bd.getPropertyValues();
+
+        if(pvs == null || pvs.isEmpty()) {
+            return;
+        }
+
+        BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this);
+        TypeConverter converter = new SimpleTypeConverter();
+
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
+            PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
+
+            for (PropertyValue pv : pvs) {
+                String propertyName = pv.getName();
+                Object orginalvalue = pv.getValue();
+                Object resolvedValue = valueResolver.resolveValueIfNecessary(orginalvalue);
+
+                for (PropertyDescriptor pd : pds) {
+                    if(pd.getName().equals(propertyName)) {
+                        Object convertedValue = converter.convertIfNecessary(resolvedValue, pd.getPropertyType());
+                        pd.getWriteMethod().invoke(bean, convertedValue);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new BeanCreationException("Failed to obtain BeanInfo for class [" +
+                                                bd.getBeanClassName() + "]");
+        }
+    }
+
+    /**
+     * 实例化含有默认构造器的对象
+     * @param bd
+     * @return
+     */
+    private Object instantiateBean(BeanDefinition bd) {
+        ClassLoader cl = this.getBeanClassLoader();
+        String beanClassName = bd.getBeanClassName();
+        try {
+            Class<?> clz = cl.loadClass(beanClassName);
+            return clz.newInstance();
+        } catch (Exception e) {
+            throw new BeanCreationException("create bean for " + beanClassName + "failed", e);
         }
     }
 
@@ -51,18 +111,6 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
     @Override
     public void registerBeanDefinition(String beanId, BeanDefinition bd) {
         this.beanDefinitionMap.put(beanId, bd);
-    }
-
-    private Object resovleSingletonObject(BeanDefinition bd) {
-        Class<?> clazz = null;
-        String beanClassName = bd.getBeanClassName();
-        try {
-            // TODO classLoader问题
-            clazz = this.getBeanClassLoader().loadClass(beanClassName);
-            return clazz.newInstance();
-        } catch (Exception e) {
-            throw new BeanCreationException("create bean " + beanClassName + " failed", e);
-        }
     }
 
     @Override

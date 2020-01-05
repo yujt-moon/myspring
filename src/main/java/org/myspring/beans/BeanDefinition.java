@@ -54,5 +54,15 @@ public interface BeanDefinition {
      */
     String getScope();
 
+    /**
+     * 设置scope
+     * @param scope
+     */
+    void setScope(String scope);
+
     List<PropertyValue> getPropertyValues();
+
+    ConstructorArgument getConstructorArgument();
+
+    boolean hasConstructorArgumentValues();
 }

@@ -9,9 +9,9 @@ import org.myspring.beans.factory.config.TypedStringValue;
  */
 public class BeanDefinitionValueResolver {
 
-    private final DefaultBeanFactory beanFactory;
+    private final AbstractBeanFactory beanFactory;
 
-    public BeanDefinitionValueResolver(DefaultBeanFactory beanFactory) {
+    public BeanDefinitionValueResolver(AbstractBeanFactory beanFactory) {
         this.beanFactory = beanFactory;
     }
 

@@ -5,7 +5,6 @@ import org.myspring.beans.PropertyValue;
 import org.myspring.beans.SimpleTypeConverter;
 import org.myspring.beans.TypeConverter;
 import org.myspring.beans.factory.BeanCreationException;
-import org.myspring.beans.factory.config.ConfigurableBeanFactory;
 import org.myspring.util.ClassUtils;
 
 import java.beans.BeanInfo;
@@ -20,8 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author yujiangtao
  * @date 2018/8/2 11:08
  */
-public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
-                                implements ConfigurableBeanFactory, BeanDefinitionRegistry {
+public class DefaultBeanFactory extends AbstractBeanFactory
+                                    implements BeanDefinitionRegistry {
 
     // 存储bean的定义
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>();
@@ -46,7 +45,8 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
         return createBean(bd);
     }
 
-    private Object createBean(BeanDefinition bd) {
+    @Override
+    protected Object createBean(BeanDefinition bd) {
         // 创建实例
         Object bean = instantiateBean(bd);
         // 设置属性
@@ -93,13 +93,21 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
      * @return
      */
     private Object instantiateBean(BeanDefinition bd) {
-        ClassLoader cl = this.getBeanClassLoader();
-        String beanClassName = bd.getBeanClassName();
-        try {
-            Class<?> clz = cl.loadClass(beanClassName);
-            return clz.newInstance();
-        } catch (Exception e) {
-            throw new BeanCreationException("create bean for " + beanClassName + "failed", e);
+        // 有参构造器
+        if(bd.hasConstructorArgumentValues()) {
+            ConstructorResolver resolver = new ConstructorResolver(this);
+            return resolver.autowireConstructor(bd);
+        }
+        // 无参构造器
+        else {
+            ClassLoader cl = this.getBeanClassLoader();
+            String beanClassName = bd.getBeanClassName();
+            try {
+                Class<?> clz = cl.loadClass(beanClassName);
+                return clz.newInstance();
+            } catch (Exception e) {
+                throw new BeanCreationException("create bean for " + beanClassName + "failed", e);
+            }
         }
     }
 

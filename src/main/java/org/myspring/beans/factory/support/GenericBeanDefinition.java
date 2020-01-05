@@ -1,6 +1,7 @@
 package org.myspring.beans.factory.support;
 
 import org.myspring.beans.BeanDefinition;
+import org.myspring.beans.ConstructorArgument;
 import org.myspring.beans.PropertyValue;
 
 import java.util.ArrayList;
@@ -29,9 +30,21 @@ public class GenericBeanDefinition implements BeanDefinition {
     private String scope;
 
     /**
+     * 是否是单例
+     */
+    private boolean singleton = true;
+
+    /**
+     * 是否是原型
+     */
+    private boolean prototype = false;
+
+    /**
      * 存储属性信息
      */
     private List<PropertyValue> propertyValues = new ArrayList<PropertyValue>();
+
+    private ConstructorArgument constructorArgument = new ConstructorArgument();
 
     public GenericBeanDefinition(String id, String beanClassName) {
         this(id, beanClassName, "");
@@ -69,7 +82,24 @@ public class GenericBeanDefinition implements BeanDefinition {
     }
 
     @Override
+    public void setScope(String scope) {
+        this.scope = scope;
+        this.singleton = SCOPE_SINGLETON.equals(scope) || SCOPE_DEFAULT.equals(scope);
+        this.prototype = SCOPE_PROTOTYPE.equals(scope);
+    }
+
+    @Override
     public List<PropertyValue> getPropertyValues() {
         return this.propertyValues;
+    }
+
+    @Override
+    public ConstructorArgument getConstructorArgument() {
+        return this.constructorArgument;
+    }
+
+    @Override
+    public boolean hasConstructorArgumentValues() {
+        return !this.constructorArgument.isEmpty();
     }
 }

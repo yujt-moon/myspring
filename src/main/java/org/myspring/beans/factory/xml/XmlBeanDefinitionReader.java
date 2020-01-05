@@ -6,6 +6,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.myspring.beans.BeanDefinition;
+import org.myspring.beans.ConstructorArgument;
 import org.myspring.beans.PropertyValue;
 import org.myspring.beans.factory.BeanDefinitionStoreException;
 import org.myspring.beans.factory.config.RuntimeBeanReference;
@@ -66,6 +67,16 @@ public class XmlBeanDefinitionReader {
      */
     public static final String NAME_ATTRIBUTE = "name";
 
+    /**
+     * constructor-arg 标签
+     */
+    public static final String CONSTRUCTOR_ARG_ELEMENT = "constructor-arg";
+
+    /**
+     * type 属性
+     */
+    public static final String TYPE_ATTRIBUTE = "type";
+
     private BeanDefinitionRegistry registry;
 
     protected final Log logger = LogFactory.getLog(this.getClass());
@@ -92,15 +103,12 @@ public class XmlBeanDefinitionReader {
                     String id = ele.attributeValue(ID_ATTRIBUTE);
                     // 获取bean class
                     String className = ele.attributeValue(CLASS_ATTRIBUTE);
-                    // 获取bean scope
-                    String scope = ele.attributeValue(SCOPE_ATTRIBUTE);
-                    BeanDefinition bd = null;
-                    if(StringUtils.hasLength(scope)) {
-                        bd = new GenericBeanDefinition(id, className, scope);
-                    } else {
-                        bd = new GenericBeanDefinition(id, className);
+                    BeanDefinition bd = new GenericBeanDefinition(id, className);
+                    if(ele.attribute(SCOPE_ATTRIBUTE) != null) {
+                        bd.setScope(ele.attributeValue(SCOPE_ATTRIBUTE));
                     }
                     parsePropertyElement(ele, bd);
+                    parseConstructorArgElements(ele, bd);
                     registry.registerBeanDefinition(id, bd);
                 }
             }
@@ -116,6 +124,28 @@ public class XmlBeanDefinitionReader {
                 }
             }
         }
+    }
+
+    private void parseConstructorArgElements(Element beanEle, BeanDefinition bd) {
+        Iterator iter = beanEle.elementIterator(CONSTRUCTOR_ARG_ELEMENT);
+        while(iter.hasNext()) {
+            Element ele = (Element) iter.next();
+            parseConstructorArgElement(ele, bd);
+        }
+    }
+
+    private void parseConstructorArgElement(Element ele, BeanDefinition bd) {
+        String typeAttr = ele.attributeValue(TYPE_ATTRIBUTE);
+        String nameAttr = ele.attributeValue(NAME_ATTRIBUTE);
+        Object value = parsePropertyValue(ele, bd, null);
+        ConstructorArgument.ValueHolder valueHolder = new ConstructorArgument.ValueHolder(value);
+        if(StringUtils.hasLength(typeAttr)) {
+            valueHolder.setType(typeAttr);
+        }
+        if(StringUtils.hasLength(nameAttr)) {
+            valueHolder.setName(nameAttr);
+        }
+        bd.getConstructorArgument().addArgumentValue(valueHolder);
     }
 
     private void parsePropertyElement(Element beanElem, BeanDefinition bd) {

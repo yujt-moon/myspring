@@ -1,0 +1,34 @@
+@startuml
+
+interface PropertyEditor {
+    + void setAsText(String text) throws IllegalArgumentException;
+    + String getAsText();
+    + Object getValue();
+}
+
+class PropertyEditorSupport {
+}
+
+class CustomBooleanEditor {
+}
+
+class CustomNumberEditor {
+}
+
+PropertyEditorSupport ..|> PropertyEditor
+CustomBooleanEditor --|> PropertyEditorSupport
+CustomNumberEditor --|> PropertyEditorSupport
+
+interface TypeConverter {
+    + T convertIfNecessary(Object, Class<T>)
+}
+
+class SimpleTypeConverter {
+
+}
+
+TypeConverter ..|> SimpleTypeConverter
+
+
+
+@enduml

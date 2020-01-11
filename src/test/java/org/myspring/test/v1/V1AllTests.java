@@ -10,10 +10,10 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        ApplicationContextTest.class,
+        ResourceTest.class,
         BeanFactoryTest.class,
         BeanScopeTest.class,
-        ResourceTest.class
+        ApplicationContextTest.class
 })
 public class V1AllTests {
 }

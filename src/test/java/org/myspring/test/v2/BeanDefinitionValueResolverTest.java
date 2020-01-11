@@ -11,6 +11,7 @@ import org.myspring.core.io.ClassPathResource;
 import org.myspring.dao.v2.AccountDao;
 
 /**
+ * 测试处理<property></property>的value和ref的值
  * @author yujiangtao
  * @date 2018/6/23 14:09
  */

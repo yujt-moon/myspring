@@ -10,6 +10,7 @@ import org.myspring.context.support.ClassPathXmlApplicationContext;
 import static org.junit.Assert.*;
 
 /**
+ * 测试<property></property>方式注入属性
  * @author yujiangtao
  * @date 2018/6/22 20:35
  */

@@ -11,7 +11,7 @@ import java.io.InputStream;
 public interface Resource {
 
     /**
-     * 获取输入流
+     * 获取输入流（哪一种设计模式：模板方法？）
      * @return
      * @throws IOException
      */

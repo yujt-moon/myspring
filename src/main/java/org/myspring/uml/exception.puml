@@ -1,0 +1,15 @@
+@startuml
+
+class RuntimeException
+
+abstract class BeansException
+
+class BeanDefinitionStoreException
+
+class BeanCreationException
+
+
+BeansException --|> RuntimeException
+BeanCreationException --|> BeansException
+BeanDefinitionStoreException --|> BeansException
+@enduml

@@ -7,6 +7,7 @@ import java.beans.PropertyEditorSupport;
 import java.text.NumberFormat;
 
 /**
+ * 将字符串转换成指定的数值类型
  * @author yujiangtao
  * @date 2020/1/2 19:35
  */

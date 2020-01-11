@@ -5,6 +5,8 @@ import org.myspring.util.StringUtils;
 import java.beans.PropertyEditorSupport;
 
 /**
+ * 将某些默认的字符串转换成boolean类型的值
+ * （"true", "false"; "on", "off"; "yes", "no"; "1", "0"）
  * @author yujiangtao
  * @date 2020/1/2 20:04
  */

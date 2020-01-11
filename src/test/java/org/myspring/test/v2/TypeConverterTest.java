@@ -9,6 +9,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
+ * 测试字符串类型转换成其他类型（数值类型和布尔类型）
  * @author yujiangtao
  * @date 2018/6/27 18:40
  */

@@ -15,6 +15,10 @@ import java.io.InputStream;
  */
 public class ResourceTest {
 
+    /**
+     * 测试读取classpath下的文件，获取配置信息
+     * @throws Exception
+     */
     @Test
     public void testClassPathResource() throws Exception {
         Resource r = new ClassPathResource("petstore-v1.xml");
@@ -28,7 +32,7 @@ public class ResourceTest {
     }
 
     /**
-     * 测试改文件资源是否存在
+     * 测试该文件资源是否存在
      * @param r
      * @throws Exception
      */
@@ -42,6 +46,7 @@ public class ResourceTest {
             Assert.assertNotNull(description);
         } finally {
             if(is != null) {
+                // 关闭流
                 is.close();
             }
         }

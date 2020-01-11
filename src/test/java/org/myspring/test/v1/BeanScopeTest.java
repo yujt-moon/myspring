@@ -11,7 +11,7 @@ import org.myspring.service.v1.DogStoreService;
 import org.myspring.service.v1.PetStoreService;
 
 /**
- * bean的scope的单元测试
+ * bean的scope的单元测试（后添加，用来测试边界和异常情况）
  * @author yujiangtao
  * @date 2018/8/22 20:43
  */

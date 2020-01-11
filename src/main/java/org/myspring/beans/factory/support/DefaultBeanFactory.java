@@ -78,17 +78,18 @@ public class DefaultBeanFactory extends AbstractBeanFactory
             }
         }
 
-
+        // 获取<bean>中的<property>标签的属性
         List<PropertyValue> pvs = bd.getPropertyValues();
-
         if(pvs == null || pvs.isEmpty()) {
             return;
         }
 
+        // 将标签<property>中的value和ref的值转换为对应的实际的值
         BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this);
         TypeConverter converter = new SimpleTypeConverter();
 
         try {
+            // 使用javabean提供的方法，未使用反射（底层实现？）
             BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
             PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
 

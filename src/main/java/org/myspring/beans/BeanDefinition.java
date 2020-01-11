@@ -60,6 +60,10 @@ public interface BeanDefinition {
      */
     void setScope(String scope);
 
+    /**
+     * <property></property>标签中的value和ref属性的信息
+     * @return
+     */
     List<PropertyValue> getPropertyValues();
 
     ConstructorArgument getConstructorArgument();

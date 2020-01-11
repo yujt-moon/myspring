@@ -12,6 +12,7 @@ import org.myspring.core.io.ClassPathResource;
 import java.util.List;
 
 /**
+ * 测试是否获取ref属性
  * @author yujiangtao
  * @date 2018/6/23 13:02
  */

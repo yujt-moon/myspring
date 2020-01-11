@@ -6,6 +6,9 @@ import org.junit.Test;
 import org.myspring.beans.propertyeditors.CustomBooleanEditor;
 
 /**
+ * 测试 CustomBooleanEditor 是否能将默认的某些字符串的值
+ * （"true", "false"; "on", "off"; "yes", "no"; "1", "0"）
+ * 转换成boolean类型的值
  * @author yujiangtao
  * @date 2018/6/27 17:11
  */

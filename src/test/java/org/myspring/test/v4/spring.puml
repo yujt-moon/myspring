@@ -1,0 +1,64 @@
+@startuml
+
+class ClassPathBeanDefinitionScanner {
+    - final registry : BeanDefinitionRegistry
+    - resourceLoader : PackageResourceLoader
+    - beanNameGenerator : BeanNameGenerator
+    - logger : Log
+    + ClassPathBeanDefinitionScanner(BeanDefinitionRegistry)
+    + Set<BeanDefinition> doScan(String)
+    + Set<BeanDefinition> findCandidateComponents(String)
+}
+
+interface BeanNameGenerator {
+    + String generateBeanName(BeanDefinition, BeanDefinitionRegistry)
+}
+
+class AnnotationBeanNameGenerator {
+    # String determineBeanNameFromAnnotation(AnnotationBeanDefinition)
+    # String buildDefaultBeanName(BeanDefinition)
+}
+
+class PackageResourceLoader {
+    - {static} final logger : Log
+    - final classLoader : ClassLoader
+    + PackageResourceLoader()
+    + ClassLoader getClassLoader()
+    + Resource[] getResources(String)
+    # Set<File> retrieveMatchingFiles(File)
+    ..递归获取文件..
+    # void doRetrieveMatchingFiles(File, Set<File>)
+}
+
+interface MetadataReader {
+    + Resource getResource()
+    + ClassMetadata getClassMetadata()
+    + AnnotationMetadata getAnnotationMetadata()
+}
+
+class SimpleMetadataReader {
+    - final resource : Resource
+    - final classMetadata : ClassMetadata
+    - final annotationMetadata : AnnotationMetadata
+    + SimpleMetadataReader(Resource)
+}
+
+interface BeanDefinition {
+
+}
+
+class GenericBeanDefinition {
+
+}
+
+class ScannedGenericBeanDefinition {
+
+}
+
+AnnotationBeanNameGenerator ..|> BeanNameGenerator
+GenericBeanDefinition ..|> BeanDefinition
+ScannedGenericBeanDefinition --|> GenericBeanDefinition
+ScannedGenericBeanDefinition ..|> AnnotationBeanDefinition
+
+MetadataReader ..|> SimpleMetadataReader
+@enduml

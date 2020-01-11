@@ -5,5 +5,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:component-scan base-package="org.litespring.service.v4, org.litespring.dao.v4"></context:component-scan>
+    <context:component-scan base-package="org.myspring.service.v4, org.myspring.dao.v4"></context:component-scan>
+
+    <bean id="priceDao" class="org.myspring.dao.v4.PriceDao"></bean>
+    <bean id="itemDao" class="org.myspring.dao.v4.ItemDao"></bean>
 </beans>

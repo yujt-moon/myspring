@@ -49,7 +49,7 @@ public class PackageResourceLoader {
         ClassLoader cl = getClassLoader();
         URL url = cl.getResource(location);
         if(url == null) {
-            throw new IOException("该文件路径不存在");
+            throw new IOException("该文件路径[" + basePackage + "]不存在");
         }
         File rootDir = new File(url.getFile());
 

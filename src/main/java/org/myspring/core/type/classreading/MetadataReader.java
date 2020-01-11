@@ -1,6 +1,7 @@
 package org.myspring.core.type.classreading;
 
 import org.myspring.core.io.Resource;
+import org.myspring.core.type.AnnotationMetadata;
 import org.myspring.core.type.ClassMetadata;
 
 /**
@@ -22,4 +23,11 @@ public interface MetadataReader {
      * @return
      */
     ClassMetadata getClassMetadata();
+
+    /**
+     * Read full annotation metadata for the underlying class,
+     * including metadata for annotated methods.
+     * @return
+     */
+    AnnotationMetadata getAnnotationMetadata();
 }

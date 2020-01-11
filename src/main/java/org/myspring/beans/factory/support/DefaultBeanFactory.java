@@ -5,11 +5,15 @@ import org.myspring.beans.PropertyValue;
 import org.myspring.beans.SimpleTypeConverter;
 import org.myspring.beans.TypeConverter;
 import org.myspring.beans.factory.BeanCreationException;
+import org.myspring.beans.factory.config.BeanPostProcessor;
+import org.myspring.beans.factory.config.DependencyDescriptor;
+import org.myspring.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.myspring.util.ClassUtils;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +29,18 @@ public class DefaultBeanFactory extends AbstractBeanFactory
     // 存储bean的定义
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>();
 
+    private List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
+
     private ClassLoader beanClassLoader;
+
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor postProcessor) {
+        this.beanPostProcessors.add(postProcessor);
+    }
+
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return this.beanPostProcessors;
+    }
 
     @Override
     public Object getBean(String beanId) {
@@ -55,6 +70,15 @@ public class DefaultBeanFactory extends AbstractBeanFactory
     }
 
     protected void populateBean(BeanDefinition bd, Object bean) {
+
+        // 注解注入（component/autowired）
+        for(BeanPostProcessor processor : this.beanPostProcessors) {
+            if(processor instanceof InstantiationAwareBeanPostProcessor) {
+                ((InstantiationAwareBeanPostProcessor) processor).postProcessPropertyValues(bean, bd.getId());
+            }
+        }
+
+
         List<PropertyValue> pvs = bd.getPropertyValues();
 
         if(pvs == null || pvs.isEmpty()) {
@@ -129,5 +153,32 @@ public class DefaultBeanFactory extends AbstractBeanFactory
     @Override
     public ClassLoader getBeanClassLoader() {
         return this.beanClassLoader == null ? ClassUtils.getDefaultClassLoader() : this.beanClassLoader;
+    }
+
+    @Override
+    public Object resolveDependency(DependencyDescriptor descriptor) {
+        Class<?> typeToMatch = descriptor.getDependencyType();
+        for(BeanDefinition bd : this.beanDefinitionMap.values()) {
+            // 确保BeanDefinition有Class对象
+            resolveBeanClass(bd);
+            Class<?> beanClass = bd.getBeanClass();
+            if(typeToMatch.isAssignableFrom(beanClass)) {
+                return this.getBean(bd.getId());
+            }
+        }
+        return null;
+    }
+
+    private void resolveBeanClass(BeanDefinition bd) {
+        if(bd.hasBeanClass()) {
+            return;
+        } else {
+            try {
+                bd.resolveBeanClass(this.getBeanClassLoader());
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("can't load class: " +
+                                            bd.getBeanClassName());
+            }
+        }
     }
 }

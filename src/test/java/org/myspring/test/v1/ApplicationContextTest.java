@@ -23,7 +23,7 @@ public class ApplicationContextTest {
 
     @Test
     public void testGetBeanFromFileSystem() {
-        ApplicationContext ctx = new FileSystemXmlApplicationContext("D:\\study\\workspace\\myspring\\src\\test\\resources\\petstore-v1.xml");
+        ApplicationContext ctx = new FileSystemXmlApplicationContext(System.getProperty("user.dir") + "/src/test/resources/petstore-v1.xml");
         PetStoreService petStore = (PetStoreService)ctx.getBean("petStore");
         assertNotNull(petStore);
     }

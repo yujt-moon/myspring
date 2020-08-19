@@ -1,6 +1,10 @@
 package org.myspring.beans.factory.support;
 
 import org.myspring.beans.BeanDefinition;
+import org.myspring.beans.PropertyValue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 普通的beanDefinition
@@ -23,6 +27,11 @@ public class GenericBeanDefinition implements BeanDefinition {
      * scope对应于xml中的<bean scope="singleton|prototype"></>
      */
     private String scope;
+
+    /**
+     * 存放 <property name="accountDao" ref="accountDao"/> 标签信息
+     */
+    private List<PropertyValue> propertyValues = new ArrayList<>();
 
     public GenericBeanDefinition(String id, String beanClassName) {
         this(id, beanClassName, "");
@@ -57,5 +66,10 @@ public class GenericBeanDefinition implements BeanDefinition {
     @Override
     public String getScope() {
         return this.scope;
+    }
+
+    @Override
+    public List<PropertyValue> getPropertyValues() {
+        return propertyValues;
     }
 }

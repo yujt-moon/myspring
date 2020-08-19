@@ -1,5 +1,7 @@
 package org.myspring.beans;
 
+import java.util.List;
+
 /**
  * bean定义类
  * @author yujiangtao
@@ -51,4 +53,10 @@ public interface BeanDefinition {
      * @return
      */
     String getScope();
+
+    /**
+     * 存放 <property name="accountDao" ref="accountDao"/> 标签信息
+     * @return
+     */
+    List<PropertyValue> getPropertyValues();
 }

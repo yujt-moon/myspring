@@ -5,6 +5,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.myspring.beans.BeanDefinition;
+import org.myspring.beans.ConstructorArgument;
 import org.myspring.beans.PropertyValue;
 import org.myspring.beans.factory.BeanDefinitionStoreException;
 import org.myspring.beans.factory.config.RuntimeBeanReference;
@@ -28,7 +29,7 @@ public class XmlBeanDefinitionReader {
     /**
      * bean 标签
      */
-    public static final String ELEMENT_BEAN = "bean";
+    public static final String BEAN_ELEMENT = "bean";
 
     /**
      * id 属性
@@ -65,6 +66,16 @@ public class XmlBeanDefinitionReader {
      */
     public static final String NAME_ATTRIBUTE = "name";
 
+    /**
+     * constructor-arg 标签
+     */
+    public static final String CONSTRUCTOR_ARG_ELEMENT = "constructor-arg";
+
+    /**
+     * type 属性
+     */
+    public static final String TYPE_ATTRIBUTE = "type";
+
     private BeanDefinitionRegistry registry;
 
     protected final Logger logger = Logger.getLogger(getClass());
@@ -73,6 +84,10 @@ public class XmlBeanDefinitionReader {
         this.registry = registry;
     }
 
+    /**
+     * 加载 <bean></bean> 的信息
+     * @param resource
+     */
     public void loadBeanDefinitions(Resource resource) {
         InputStream is = null;
         SAXReader reader = new SAXReader();
@@ -86,7 +101,7 @@ public class XmlBeanDefinitionReader {
             while(it.hasNext()) {
                 Element ele = (Element) it.next();
                 // 处理bean标签
-                if(ELEMENT_BEAN.equals(ele.getName())) {
+                if(BEAN_ELEMENT.equals(ele.getName())) {
                     // 获取bean id
                     String id = ele.attributeValue(ATTRIBUTE_ID);
                     // 获取bean class
@@ -99,6 +114,7 @@ public class XmlBeanDefinitionReader {
                     } else {
                         bd = new GenericBeanDefinition(id, className);
                     }
+                    parseConstructorArgElements(ele, bd);
                     parsePropertyElement(ele, bd);
                     registry.registerBeanDefinition(id, bd);
                 }
@@ -116,6 +132,39 @@ public class XmlBeanDefinitionReader {
             }
         }
     }
+
+    /**
+     * 解析构造参数的信息
+     *     <bean id="petStore" class="org.myspring.service.v3.PetStoreService">
+     *         <constructor-arg ref="accountDao" />
+     *         <constructor-arg ref="itemDao" />
+     *         <constructor-arg value="1" />
+     *     </bean>
+     * @param ele
+     * @param bd
+     */
+    private void parseConstructorArgElements(Element ele, BeanDefinition bd) {
+        Iterator iterator = ele.elementIterator(CONSTRUCTOR_ARG_ELEMENT);
+        while(iterator.hasNext()) {
+            Element next = (Element) iterator.next();
+            parseConstructorArgElement(next, bd);
+        }
+    }
+
+    private void parseConstructorArgElement(Element ele, BeanDefinition bd) {
+        String typeAttr = ele.attributeValue(TYPE_ATTRIBUTE);
+        String nameAttr = ele.attributeValue(NAME_ATTRIBUTE);
+        Object value = parsePropertyValue(ele, bd, null);
+        ConstructorArgument.ValueHolder valueHolder = new ConstructorArgument.ValueHolder(value);
+        if(StringUtils.hasLength(typeAttr)) {
+            valueHolder.setType(typeAttr);
+        }
+        if(StringUtils.hasLength(nameAttr)) {
+            valueHolder.setName(nameAttr);
+        }
+        bd.getConstructorArgument().addArgumentValue(valueHolder);
+    }
+
 
     /**
      * 解析 <property name="accountDao" ref="accountDao"/>

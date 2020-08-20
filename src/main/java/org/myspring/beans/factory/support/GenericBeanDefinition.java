@@ -1,6 +1,7 @@
 package org.myspring.beans.factory.support;
 
 import org.myspring.beans.BeanDefinition;
+import org.myspring.beans.ConstructorArgument;
 import org.myspring.beans.PropertyValue;
 
 import java.util.ArrayList;
@@ -32,6 +33,12 @@ public class GenericBeanDefinition implements BeanDefinition {
      * 存放 <property name="accountDao" ref="accountDao"/> 标签信息
      */
     private List<PropertyValue> propertyValues = new ArrayList<>();
+
+    /**
+     * 存放多个 <constructor-arg ref="itemDao" />
+     *         <constructor-arg value="1" /> 标签
+     */
+    private ConstructorArgument constructorArgument = new ConstructorArgument();
 
     public GenericBeanDefinition(String id, String beanClassName) {
         this(id, beanClassName, "");
@@ -71,5 +78,15 @@ public class GenericBeanDefinition implements BeanDefinition {
     @Override
     public List<PropertyValue> getPropertyValues() {
         return propertyValues;
+    }
+
+    @Override
+    public ConstructorArgument getConstructorArgument() {
+        return this.constructorArgument;
+    }
+
+    @Override
+    public boolean hasConstructArgumentValues() {
+        return !this.constructorArgument.isEmpty();
     }
 }

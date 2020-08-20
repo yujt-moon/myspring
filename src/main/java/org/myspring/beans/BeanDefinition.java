@@ -59,4 +59,12 @@ public interface BeanDefinition {
      * @return
      */
     List<PropertyValue> getPropertyValues();
+
+    /**
+     * 存放 <constructor-arg ref="accountDao" /> 标签信息
+     * @return
+     */
+    ConstructorArgument getConstructorArgument();
+
+    boolean hasConstructArgumentValues();
 }

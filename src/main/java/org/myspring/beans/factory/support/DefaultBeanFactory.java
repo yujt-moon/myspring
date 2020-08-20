@@ -1,5 +1,6 @@
 package org.myspring.beans.factory.support;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.myspring.beans.BeanDefinition;
 import org.myspring.beans.PropertyValue;
 import org.myspring.beans.SimpleTypeConverter;
@@ -11,9 +12,11 @@ import org.myspring.util.ClassUtils;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 默认的beanFactory
@@ -87,6 +90,28 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
         }
     }
 
+    private void populateBeanUseCommonBeanUtils(BeanDefinition bd, Object bean) {
+        List<PropertyValue> pvs = bd.getPropertyValues();
+        if(pvs == null || pvs.isEmpty()) {
+            return;
+        }
+
+        BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this);
+
+        try {
+            for (PropertyValue pv : pvs) {
+                String propertyName = pv.getName();
+                // RuntimeBeanReference or TypedStringValue
+                Object originalValue = pv.getValue();
+                Object resolvedValue = valueResolver.resolveValueIfNecessary(originalValue);
+                BeanUtils.setProperty(bean, propertyName, resolvedValue);
+            }
+        } catch (Exception e) {
+            throw new BeanCreationException("Failed to obtain BeanInfo for class [" +
+                    bd.getBeanClassName() + "]", e);
+        }
+    }
+
     @Override
     public BeanDefinition getBeanDefinition(String beanId) {
         return this.beanDefinitionMap.get(beanId);
@@ -100,12 +125,16 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
     private Object instantiateBean(BeanDefinition bd) {
         Class<?> clazz = null;
         String beanClassName = bd.getBeanClassName();
-        try {
-            // TODO classLoader问题
-            clazz = this.getBeanClassLoader().loadClass(beanClassName);
-            return clazz.newInstance();
-        } catch (Exception e) {
-            throw new BeanCreationException("create bean " + beanClassName + " failed", e);
+        if(bd.hasConstructArgumentValues()) {
+            ConstructorResolver constructorResolver = new ConstructorResolver(this);
+            return constructorResolver.autowireConstructor(bd);
+        } else {
+            try {
+                clazz = this.getBeanClassLoader().loadClass(beanClassName);
+                return clazz.newInstance();
+            } catch (Exception e) {
+                throw new BeanCreationException("create bean '" + beanClassName + "' failed", e);
+            }
         }
     }
 

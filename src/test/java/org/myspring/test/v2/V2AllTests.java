@@ -17,5 +17,5 @@ import org.myspring.beans.TypeConverter;
         TypeConverterTest.class,
         ApplicationContextTestV2.class
 })
-public class V2AllTest {
+public class V2AllTests {
 }

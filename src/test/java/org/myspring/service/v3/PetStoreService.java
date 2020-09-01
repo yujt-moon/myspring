@@ -21,6 +21,12 @@ public class PetStoreService {
         this.version = -1;
     }
 
+    public PetStoreService(AccountDao accountDao, ItemDao itemDao, String version) {
+        this.accountDao = accountDao;
+        this.itemDao = itemDao;
+        this.version = Integer.valueOf(version) + 1;
+    }
+
     public PetStoreService(AccountDao accountDao, ItemDao itemDao, int version) {
         this.accountDao = accountDao;
         this.itemDao = itemDao;

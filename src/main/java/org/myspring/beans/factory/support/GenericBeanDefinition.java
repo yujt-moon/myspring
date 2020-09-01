@@ -3,6 +3,7 @@ package org.myspring.beans.factory.support;
 import org.myspring.beans.BeanDefinition;
 import org.myspring.beans.ConstructorArgument;
 import org.myspring.beans.PropertyValue;
+import org.myspring.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,11 @@ public class GenericBeanDefinition implements BeanDefinition {
      *         <constructor-arg value="1" /> 标签
      */
     private ConstructorArgument constructorArgument = new ConstructorArgument();
+
+    private Class<?> beanClass;
+
+    public GenericBeanDefinition() {
+    }
 
     public GenericBeanDefinition(String id, String beanClassName) {
         this(id, beanClassName, "");
@@ -88,5 +94,40 @@ public class GenericBeanDefinition implements BeanDefinition {
     @Override
     public boolean hasConstructArgumentValues() {
         return !this.constructorArgument.isEmpty();
+    }
+
+    @Override
+    public void setBeanClassName(String beanClassName) {
+        this.beanClassName = beanClassName;
+    }
+
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException {
+        String className = getBeanClassName();
+        if(className == null) {
+            return null;
+        }
+        Class<?> resolvedClass = classLoader.loadClass(className);
+        this.beanClass = resolvedClass;
+        return resolvedClass;
+    }
+
+    @Override
+    public Class<?> getBeanClass() throws IllegalStateException {
+        if(this.beanClass == null) {
+            throw new IllegalStateException("Bean class name [" + this.getBeanClassName() +
+                    "] has not been resolved into an actual Class.");
+        }
+        return this.beanClass;
+    }
+
+    @Override
+    public boolean hasBeanClass() {
+        return this.beanClass != null;
     }
 }

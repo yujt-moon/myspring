@@ -24,7 +24,7 @@ public class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMe
     private String[] interfaces;
 
     public ClassMetadataReadingVisitor() {
-        super(327680);
+        super(Opcodes.ASM4);
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.myspring.core.type.classreading;
 import org.myspring.core.annotation.AnnotationAttributes;
 import org.myspring.core.type.AnnotationMetadata;
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Opcodes;
 
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +21,7 @@ public class AnnotationAttributesReadingVisitor extends AnnotationVisitor {
     private AnnotationAttributes attributes = new AnnotationAttributes();
 
     public AnnotationAttributesReadingVisitor(String annotationType, Map<String, AnnotationAttributes> attributeMap) {
-        super(327680);
+        super(Opcodes.ASM4);
         this.annotationType = annotationType;
         this.attributeMap = attributeMap;
     }
